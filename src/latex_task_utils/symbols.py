@@ -33,11 +33,8 @@ class Symbol:
 
     def create_macro(self) -> str:
         """Creates a plain TeX macro using `\\gdef` with the `name` and the `code`. The `code` is automatically scanned for arguments. `\\def` is used in favor of `\\newcommand` because it does not create an implicit group, so subscripts and superscripts work as expected."""
-        if "#" in self.code:
-            arguments = RE_ARGUMENT.findall(self.code)
-            return rf"\gdef\{self.format_name_with_category()}{''.join(f'#{arg}' for arg in arguments)}{{{self.code}}}"
-        else:
-            return rf"\gdef\{self.format_name_with_category()}{{{self.code}}}"
+        arguments = RE_ARGUMENT.findall(self.code)
+        return rf"\gdef\{self.format_name_with_category()}{''.join(f'#{arg}' for arg in arguments)}{{{self.code}}}{f' % {self.comment}' if self.comment else ''}"
 
 
 _T = TypeVar("_T")
@@ -95,3 +92,7 @@ def read_toml(file: str | PathLike) -> list[Symbol]:
     file = Path(file)
     doc = tomlkit.loads(file.read_text())
     return list(parse_dict(_parse_toml(doc)))
+
+
+def write_symbols_sty(file: Path, symbols: list[Symbol]):
+    file.write_text("\n".join(s.create_macro() for s in symbols))
