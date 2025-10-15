@@ -1,6 +1,7 @@
 import latex_task_utils.jinja
 import jinja2
 import pytest
+from rich import print
 
 TEMPLATES = {
     "block": r"<{ for v in var4 }><<v>><{ endfor }>",
