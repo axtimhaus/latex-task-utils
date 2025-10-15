@@ -3,3 +3,11 @@ Sym1 = "ABC"
 Sym2 = '\dot{\Sym1}'
 Sym3 = 'def' # after
 Sym4 = '\dot{#1}'
+
+[Group1]
+
+Sym1 = "ABCD"
+
+[Group1.Sub]
+
+Sym1 = "ABCDE"

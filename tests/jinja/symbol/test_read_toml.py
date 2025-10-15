@@ -10,4 +10,6 @@ def test_read_toml():
         Symbol(name="Sym2", code=r"\dot{\Sym1}", comment=None),
         Symbol(name="Sym3", code="def", comment="after"),
         Symbol(name="Sym4", code=r"\dot{#1}", comment=None),
+        Symbol(name="Sym1", code="ABCD", category=["Group1"], comment=None),
+        Symbol(name="Sym1", code="ABCDE", category=["Group1", "Sub"], comment=None),
     ]
