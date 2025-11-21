@@ -3,12 +3,12 @@ from rich import print
 from latex_task_utils.symbols import Symbol, write_symbols_sty
 
 SYMBOLS = [
-    Symbol(name="Sym1", code="ABC", comment=None),
-    Symbol(name="Sym2", code=r"\dot{\Sym1}", comment=None),
-    Symbol(name="Sym3", code="def", comment="after"),
-    Symbol(name="Sym4", code=r"\dot{#1}", comment=None),
-    Symbol(name="Sym1", code="ABCD", category=["Group1"], comment="com2"),
-    Symbol(name="Sym1", code="ABCDE", category=["Group1", "Sub"], comment=None),
+    Symbol(name="Sym1", code="ABC", doc=None),
+    Symbol(name="Sym2", code=r"\dot{\Sym1}", doc=None),
+    Symbol(name="Sym3", code="def", doc="after"),
+    Symbol(name="Sym4", code=r"\dot{#1}", doc=None),
+    Symbol(name="Sym1", code="ABCD", category=["Group1"], doc="com2"),
+    Symbol(name="Sym1", code="ABCDE", category=["Group1", "Sub"], doc=None),
 ]
 
 EXPECTED = r"""

@@ -1,8 +1,11 @@
 Sym1 = "ABC"
-# above
 Sym2 = '\dot{\Sym1}'
-Sym3 = 'def'         # after
+Sym3 = 'def'
 Sym4 = '\dot{#1}'
+Sym5.code = 'def'
+Sym5.doc = 'This is the docstring of the symbol.'
+Sym6.code = '\dot{#1}'
+Sym6.doc = 'This is the docstring of the symbol.'
 
 [Group1]
 
@@ -10,4 +13,4 @@ Sym1 = "ABCD"
 
 [Group1.Sub]
 
-Sym1 = "ABCDE"
+Sym1 = { code = "ABCDE", doc = "This is the docstring of the symbol." }

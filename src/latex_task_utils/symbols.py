@@ -21,7 +21,7 @@ class Symbol:
     name: str
     code: str
     category: list[str] = field(default_factory=list)
-    comment: str | None = None
+    doc: str | None = None
 
     def code_display(self, replacement=DEFAULT_ARGUMENT_DISPLAY_REPLACEMENT) -> str:
         """Format the `code` for display in the TeX document. The argument sequences are replaced by `replacement`, where the first and only occurrence of `{}` in the replacement text is formatted with the respective parameter index (number after `#`)."""
@@ -36,7 +36,7 @@ class Symbol:
     def create_macro(self) -> str:
         """Creates a plain TeX macro using `\\gdef` with the `name` and the `code`. The `code` is automatically scanned for arguments. `\\def` is used in favor of `\\newcommand` because it does not create an implicit group, so subscripts and superscripts work as expected."""
         arguments = RE_ARGUMENT.findall(self.code)
-        return rf"\gdef\{self.format_name_with_category()}{''.join(f'#{arg}' for arg in arguments)}{{{self.code}}}{f' % {self.comment}' if self.comment else ''}"
+        return rf"\gdef\{self.format_name_with_category()}{''.join(f'#{arg}' for arg in arguments)}{{{self.code}}}{f' % {self.doc}' if self.doc else ''}"
 
 
 _T = TypeVar("_T")
@@ -66,7 +66,7 @@ def parse_dict(d: dict[str, Any], category=[]) -> Generator[Symbol, None, None]:
                     name=k,
                     code=v["code"],
                     category=category,
-                    comment=v.get("comment", None),
+                    doc=v.get("doc", None),
                 )
             case dict():
                 yield from parse_dict(v, category=category + [k])
