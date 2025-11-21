@@ -1,10 +1,12 @@
 """Module containing utilities for dealing with mathematical symbols."""
 
 import re
+from collections.abc import Generator, Iterable
+from dataclasses import dataclass, field
 from os import PathLike
 from pathlib import Path
-from dataclasses import dataclass, field
-from typing import Any, Generator, Iterable, Literal, TypeVar
+from typing import Any, Literal, TypeVar
+
 import tomlkit
 
 RE_ARGUMENT = re.compile(r"#(\d)")

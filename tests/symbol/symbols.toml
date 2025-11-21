@@ -1,7 +1,7 @@
 Sym1 = "ABC"
 # above
 Sym2 = '\dot{\Sym1}'
-Sym3 = 'def' # after
+Sym3 = 'def'         # after
 Sym4 = '\dot{#1}'
 
 [Group1]

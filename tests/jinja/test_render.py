@@ -1,7 +1,8 @@
-import latex_task_utils.jinja
 import jinja2
 import pytest
 from rich import print
+
+import latex_task_utils.jinja
 
 TEMPLATES = {
     "block": r"<{ for v in var4 }><<v>><{ endfor }>",
@@ -25,8 +26,6 @@ def jinja_env():
 
 @pytest.mark.parametrize("template", TEMPLATES.keys())
 def test_render(template: str, jinja_env: jinja2.Environment):
-    result = jinja_env.get_template(template).render(
-        var1=42, var2=21, var3="abc", var4=[1, 2, 3]
-    )
+    result = jinja_env.get_template(template).render(var1=42, var2=21, var3="abc", var4=[1, 2, 3])
     print(result)
     assert result == EXPECTED[template]

@@ -1,8 +1,7 @@
-from copy import deepcopy
 from pathlib import Path
 
 import numpy as np
-from matplotlib import get_backend, rcParams, rcdefaults
+from matplotlib import get_backend, rcdefaults, rcParams
 
 import latex_task_utils.matplotlib as m
 

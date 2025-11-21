@@ -1,7 +1,8 @@
 """Module containing configuration for Jinja adapted to LaTeX needs."""
 
-import jinja2
 from typing import Any
+
+import jinja2
 
 __all__ = ["ENVIRONMENT_CONFIG", "get_env"]
 

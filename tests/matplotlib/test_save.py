@@ -1,7 +1,7 @@
-from pathlib import Path
-import latex_task_utils.matplotlib as m
-import pytest
 import matplotlib.pyplot as plt
+import pytest
+
+import latex_task_utils.matplotlib as m
 
 
 @pytest.mark.parametrize("formats", [None, [], ["eps"]])

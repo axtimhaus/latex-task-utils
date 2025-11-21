@@ -1,6 +1,8 @@
 from pathlib import Path
-from latex_task_utils.symbols import Symbol, read_toml
+
 from rich import print
+
+from latex_task_utils.symbols import Symbol, read_toml
 
 
 def test_read_toml():

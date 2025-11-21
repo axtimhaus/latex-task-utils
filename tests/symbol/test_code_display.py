@@ -1,6 +1,7 @@
-from latex_task_utils.symbols import Symbol
 import pytest
 from rich import print
+
+from latex_task_utils.symbols import Symbol
 
 
 @pytest.mark.parametrize(

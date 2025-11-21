@@ -1,6 +1,6 @@
-from pathlib import Path
-from latex_task_utils.symbols import Symbol, write_symbols_sty
 from rich import print
+
+from latex_task_utils.symbols import Symbol, write_symbols_sty
 
 SYMBOLS = [
     Symbol(name="Sym1", code="ABC", comment=None),
