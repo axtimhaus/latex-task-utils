@@ -13,11 +13,33 @@ from jinja2 import PackageLoader, Template
 from latex_task_utils.jinja import get_env
 
 RE_ARGUMENT = re.compile(r"#(\d)")
+"""Regex for finding LaTeX arguments in symbol code."""
 DEFAULT_ARGUMENT_DISPLAY_REPLACEMENT = "\\bullet"
+"""How to display a argument in symbol code when output to symbol index."""
 CATEGORY_ORDER: Literal["ltr", "rtl"] = "ltr"
+"""The order of categories in the generated command name."""
+
+__all__ = [
+    "Symbol",
+    "Category",
+    "SymbolsIndexTemplates",
+    "format_symbol_key",
+    "create_macro",
+    "normalize",
+    "read_toml",
+    "write_symbols_sty",
+    "get_heading_by_level",
+    "write_symbols_index",
+    "RE_ARGUMENT",
+    "DEFAULT_ARGUMENT_DISPLAY_REPLACEMENT",
+    "CATEGORY_ORDER",
+    "HEADING_BY_LEVEL",
+]
 
 
 class Symbol(pydantic.BaseModel):
+    """Representation of a mathematical symbol with name, a LaTeX-math code and a docstring."""
+
     code: str
     name: str | None = None
     doc: str | None = None
@@ -28,15 +50,15 @@ class Symbol(pydantic.BaseModel):
 
 
 def format_symbol_key(key: str, category: list[str] = []) -> str:
-    """Format the name of the symbol including its category path."""
+    """Format the name of the symbol including its category path. The result depends on `CATEGORY_ORDER`."""
     if CATEGORY_ORDER == "ltr":
-        return "".join(append(category, key))
+        return "".join(_append(category, key))
     if CATEGORY_ORDER == "rtl":
-        return "".join(prepend(reversed(category), key))
+        return "".join(_prepend(reversed(category), key))
 
 
 def create_macro(key: str, symbol: Symbol, category: list[str] = []) -> str:
-    """Creates a plain TeX macro using `\\gdef` with the `name` and the `code`. The `code` is automatically scanned for arguments. `\\def` is used in favor of `\\newcommand` because it does not create an implicit group, so subscripts and superscripts work as expected."""
+    """Creates a plain TeX macro using `\\gdef` with the `key` and the `code`. The `code` is automatically scanned for arguments. `\\def` is used in favor of `\\newcommand` because it does not create an implicit group, so subscripts and superscripts work as expected."""
     arguments = RE_ARGUMENT.findall(symbol.code)
     comment = (
         f" % {f'{symbol.name}: {symbol.doc}' if symbol.name else symbol.doc}" if (symbol.name or symbol.doc) else ""
@@ -47,6 +69,8 @@ def create_macro(key: str, symbol: Symbol, category: list[str] = []) -> str:
 
 
 class Category(pydantic.BaseModel):
+    """A category to organize symbols and further categories in with name, docstring and symbol/category items."""
+
     name: str | None = None
     doc: str | None = None
     symbols: dict[str, Symbol] = pydantic.Field(default_factory=dict)
@@ -58,17 +82,18 @@ Symbols = pydantic.RootModel[dict[str, Symbol]]
 _T = TypeVar("_T")
 
 
-def append(iterable: Iterable[_T], element: _T) -> Iterable[_T]:
+def _append(iterable: Iterable[_T], element: _T) -> Iterable[_T]:
     yield from iterable
     yield element
 
 
-def prepend(iterable: Iterable[_T], element: _T) -> Iterable[_T]:
+def _prepend(iterable: Iterable[_T], element: _T) -> Iterable[_T]:
     yield element
     yield from iterable
 
 
 def normalize(d: dict[str, Any]) -> dict[str, Any]:
+    """Normalize the dict representation of the symbol/category data structure, mainly by converting single-string symbols into dicts with a single `code` item."""
     result = dict()
 
     for k, v in d.items():
@@ -116,6 +141,8 @@ def _code_for_categories(categories, category):
 
 
 def write_symbols_sty(file: Path, symbols: Symbols | Category):
+    """Write out a LaTeX style file with command definitions of the symbols."""
+    file = Path(file)
     if isinstance(symbols, Category):
         file.write_text(_code_for_symbols(symbols.symbols, []) + "\n" + _code_for_categories(symbols.categories, []))
     else:
@@ -126,6 +153,8 @@ _JINJA_ENV = get_env(PackageLoader("latex_task_utils", "symbols_templates"))
 
 
 class SymbolsIndexTemplates:
+    """Predefined symbol index templates."""
+
     DESCRIPTION: Template = _JINJA_ENV.get_template("description.tex")
 
 
@@ -140,6 +169,7 @@ HEADING_BY_LEVEL = {
 
 
 def get_heading_by_level(level: int):
+    """Returns the respective LaTeX heading command for a respective level."""
     return HEADING_BY_LEVEL.get(level, r"\textbf")
 
 
@@ -151,6 +181,10 @@ def write_symbols_index(
     heading: str | None = "List of Symbols",
     **kwargs,
 ):
+    """
+    Render a LaTeX snippet containing the list of symbols to be `\\input` into the main document. Results is written to `file`. Optionally choose a predefined or custom Jinja-`template`. The main `heading` has the level `toplevel` and subcategories respective higher levels.
+    """
+    file = Path(file)
     if isinstance(symbols, Category):
         rendered = template.render(
             category=symbols,

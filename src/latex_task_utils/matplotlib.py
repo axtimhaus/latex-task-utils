@@ -94,8 +94,11 @@ try:
             return hashlib.sha256(raw_key.encode()).hexdigest()
 
         @classmethod
-        def from_path(cls, path: Path) -> Self:
-            return cls(name=path.as_posix(), path=path)
+        def from_path(cls, path: str | Path, additional_formats: set[str] | None = None) -> Self:
+            path = Path(path)
+            if additional_formats is None:
+                return cls(name=path.as_posix(), path=path)
+            return cls(name=path.as_posix(), path=path, additional_formats=additional_formats)
 
         def state(self) -> str | None:
             return pytask.get_state_of_path(self.path)

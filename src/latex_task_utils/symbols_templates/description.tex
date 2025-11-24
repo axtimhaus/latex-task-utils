@@ -1,5 +1,5 @@
 >>> macro render_symbol(symbol)
-\item[$<<symbol.code>>$] <{ if symbol.name and symbol.doc }> <<symbol.name>>: <<symbol.doc>> <{ elif symbol.name }> <<symbol.name>> <{ elif symbol.doc }> <<symbol.doc>> <{ endif }>
+\item[$<<symbol.code_display()>>$] <{ if symbol.name and symbol.doc }> <<symbol.name>>: <<symbol.doc>> <{ elif symbol.name }> <<symbol.name>> <{ elif symbol.doc }> <<symbol.doc>> <{ endif }>
 >>> endmacro
 
 >>> macro render_symbols(symbols)
