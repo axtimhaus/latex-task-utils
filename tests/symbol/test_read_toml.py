@@ -12,25 +12,27 @@ from latex_task_utils.symbols import read_toml
         (
             "symbols.toml",
             dict(
-                Sym1=dict(code="abc", doc="A symbol."),
-                Sym2=dict(code=r"\dot{#1}", doc=None),
-                Sym3=dict(code=r"\frac{#1}{#2}", doc="Another symbol."),
+                Sym1=dict(code="abc", doc="A symbol.", name=None),
+                Sym2=dict(code=r"\dot{#1}", doc=None, name=None),
+                Sym3=dict(code=r"\frac{#1}{#2}", doc="Another symbol.", name="Symbol 3"),
             ),
         ),
         (
             "category.toml",
             dict(
+                name=None,
                 doc="The Root",
                 symbols=dict(
-                    Sym1=dict(code="abc", doc="A symbol."),
-                    Sym2=dict(code=r"\dot{#1}", doc=None),
+                    Sym1=dict(code="abc", doc="A symbol.", name=None),
+                    Sym2=dict(code=r"\dot{#1}", doc=None, name=None),
                 ),
                 categories=dict(
                     Cat1=dict(
+                        name="Category 1",
                         doc="SubCat",
                         categories={},
                         symbols=dict(
-                            Sym3=dict(code=r"\frac{#1}{#2}", doc="Another symbol."),
+                            Sym3=dict(code=r"\frac{#1}{#2}", doc="Another symbol.", name="Symbol 3"),
                         ),
                     )
                 ),

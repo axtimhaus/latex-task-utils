@@ -19,6 +19,7 @@ CATEGORY_ORDER: Literal["ltr", "rtl"] = "ltr"
 
 class Symbol(pydantic.BaseModel):
     code: str
+    name: str | None = None
     doc: str | None = None
 
     def code_display(self, replacement=DEFAULT_ARGUMENT_DISPLAY_REPLACEMENT) -> str:
@@ -26,21 +27,29 @@ class Symbol(pydantic.BaseModel):
         return RE_ARGUMENT.sub(lambda m: replacement.format(m.group(1)), self.code)
 
 
-def format_symbol_name(name: str, category: list[str] = []) -> str:
+def format_symbol_key(key: str, category: list[str] = []) -> str:
     """Format the name of the symbol including its category path."""
     if CATEGORY_ORDER == "ltr":
-        return "".join(append(category, name))
+        return "".join(append(category, key))
     if CATEGORY_ORDER == "rtl":
-        return "".join(prepend(reversed(category), name))
+        return "".join(prepend(reversed(category), key))
 
 
-def create_macro(name: str, symbol: Symbol, category: list[str] = []) -> str:
+def create_macro(key: str, symbol: Symbol, category: list[str] = []) -> str:
     """Creates a plain TeX macro using `\\gdef` with the `name` and the `code`. The `code` is automatically scanned for arguments. `\\def` is used in favor of `\\newcommand` because it does not create an implicit group, so subscripts and superscripts work as expected."""
     arguments = RE_ARGUMENT.findall(symbol.code)
-    return rf"\gdef\{format_symbol_name(name, category)}{''.join(f'#{arg}' for arg in arguments)}{{{symbol.code}}}{f' % {symbol.doc}' if symbol.doc else ''}"
+    comment = (
+        f" % {f'{symbol.name}: ' if (symbol.name and symbol.doc) else f'{symbol.name}'}{symbol.doc}"
+        if (symbol.name or symbol.doc)
+        else ""
+    )
+    return (
+        rf"\gdef\{format_symbol_key(key, category)}{''.join(f'#{arg}' for arg in arguments)}{{{symbol.code}}}{comment}"
+    )
 
 
 class Category(pydantic.BaseModel):
+    name: str | None = None
     doc: str | None = None
     symbols: dict[str, Symbol] = pydantic.Field(default_factory=dict)
     categories: dict[str, Self] = pydantic.Field(default_factory=dict)
@@ -66,18 +75,13 @@ def normalize(d: dict[str, Any]) -> dict[str, Any]:
 
     for k, v in d.items():
         match v:
-            case str() if k == "doc":  # category doc string
+            case str() if k in ["name", "doc", "code"]:  # leaf values
                 result[k] = v
             case str():  # plain string symbol
                 result[k] = dict(
                     code=v,
                 )
-            case dict() if "code" in v:  # complex symbol
-                result[k] = dict(
-                    code=v["code"],
-                    doc=v.get("doc", None),
-                )
-            case dict():  # either categories or symbols tree
+            case dict():
                 result[k] = normalize(v)
             case _:
                 raise ValueError(f"Unable to parse: {k} = {repr(v)}")
@@ -127,15 +131,42 @@ class SymbolsIndexTemplates:
     DESCRIPTION: Template = _JINJA_ENV.get_template("description.tex")
 
 
+HEADING_BY_LEVEL = {
+    -1: r"\chapter",
+    0: r"\section",
+    1: r"\subsection",
+    2: r"\subsubsection",
+    3: r"\paragraph",
+    4: r"\subparagraph",
+}
+
+
+def get_heading_by_level(level: int):
+    return HEADING_BY_LEVEL.get(level, r"\textbf")
+
+
 def write_symbols_index(
     file: Path,
-    symbols: list[Symbol | Category],
+    symbols: Symbols | Category,
     template: Template = SymbolsIndexTemplates.DESCRIPTION,
+    toplevel=0,
     heading: str | None = "List of Symbols",
     **kwargs,
 ):
-    rendered = template.render(
-        symbols=symbols,
-        **kwargs,
-    )
+    if isinstance(symbols, Category):
+        rendered = template.render(
+            category=symbols,
+            heading=heading,
+            toplevel=toplevel,
+            get_heading_by_level=get_heading_by_level,
+            **kwargs,
+        )
+    else:
+        rendered = template.render(
+            symbols=symbols,
+            heading=heading,
+            toplevel=toplevel,
+            get_heading_by_level=get_heading_by_level,
+            **kwargs,
+        )
     file.write_text(rendered)

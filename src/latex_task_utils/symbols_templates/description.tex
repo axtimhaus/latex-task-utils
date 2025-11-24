@@ -1,0 +1,41 @@
+>>> macro render_symbol(symbol)
+\item[$<<symbol.code>>$] <{ if symbol.name and symbol.doc }> <<symbol.name>>: <<symbol.doc>> <{ elif symbol.name }> <<symbol.name>> <{ elif symbol.doc }> <<symbol.doc>> <{ endif }>
+>>> endmacro
+
+>>> macro render_symbols(symbols)
+\begin{description}
+        >>> for symbol in symbols.values()
+        << render_symbol(symbol) >>
+        >>> endfor
+\end{description}
+>>> endmacro
+
+>>> macro render_category(category, level)
+>>> if category.name
+<<get_heading_by_level(level)>>{<< category.name >>}
+>>> endif
+
+<< category.doc >>
+
+<< render_symbols(category.symbols) >>
+
+<< render_categories(category.categories, level + 1) >>
+
+>>> endmacro
+
+>>> macro render_categories(categories, level)
+>>> for category in categories.values()
+
+<< render_category(category, level) >>
+>>> endfor
+>>> endmacro
+
+<<get_heading_by_level(toplevel)>>{<< heading >>}
+
+>>> if symbols
+<< render_symbols(symbols.root) >>
+>>> elif category
+<< render_category(category, toplevel) >>
+>>> else
+\textbf{EMPTY}
+>>> endif
