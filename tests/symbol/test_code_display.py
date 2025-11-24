@@ -16,7 +16,7 @@ from latex_task_utils.symbols import Symbol
     ],
 )
 def test_code_display_default(code, replacement, expected):
-    s = Symbol(name="test", code=code)
+    s = Symbol(code=code)
     result = s.code_display(replacement)
     print(result)
     assert result == expected

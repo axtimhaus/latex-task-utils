@@ -1,15 +1,29 @@
 from rich import print
 
-from latex_task_utils.symbols import Symbol, write_symbols_sty
+from latex_task_utils.symbols import Category, Symbol, write_symbols_sty
 
-SYMBOLS = [
-    Symbol(name="Sym1", code="ABC", doc=None),
-    Symbol(name="Sym2", code=r"\dot{\Sym1}", doc=None),
-    Symbol(name="Sym3", code="def", doc="after"),
-    Symbol(name="Sym4", code=r"\dot{#1}", doc=None),
-    Symbol(name="Sym1", code="ABCD", category=["Group1"], doc="com2"),
-    Symbol(name="Sym1", code="ABCDE", category=["Group1", "Sub"], doc=None),
-]
+SYMBOLS = {
+    "symbols": {
+        "Sym1": Symbol(code="ABC", doc=None),
+        "Sym2": Symbol(code=r"\dot{\Sym1}", doc=None),
+        "Sym3": Symbol(code="def", doc="after"),
+        "Sym4": Symbol(code=r"\dot{#1}", doc=None),
+    },
+    "categories": {
+        "Group1": {
+            "symbols": {
+                "Sym1": Symbol(code="ABCD", doc="com2"),
+            },
+            "categories": {
+                "Sub": {
+                    "symbols": {
+                        "Sym1": Symbol(code="ABCDE", doc=None),
+                    }
+                }
+            },
+        },
+    },
+}
 
 EXPECTED = r"""
 \gdef\Sym1{ABC}
@@ -21,9 +35,9 @@ EXPECTED = r"""
 """.strip()
 
 
-def test_read_toml(tmp_path):
+def test_write_symbols_sty(tmp_path):
     file = tmp_path / "symbols.sty"
-    write_symbols_sty(file, SYMBOLS)
+    write_symbols_sty(file, Category.model_validate(SYMBOLS))
     result = file.read_text().strip()
     print(result)
     assert result == EXPECTED

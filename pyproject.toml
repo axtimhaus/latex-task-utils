@@ -4,8 +4,13 @@ version = "0.1.0"
 description = "A utility package for building LaTeX documents with task runners (e.g. pytask)."
 readme = "README.md"
 authors = [{ name = "Max Weiner", email = "max.weiner@posteo.de" }]
-requires-python = ">=3.10"
-dependencies = ["jinja2>=3.0", "matplotlib>=3.8", "tomlkit>=0.13"]
+requires-python = ">=3.11"
+dependencies = [
+  "jinja2>=3.0",
+  "matplotlib>=3.8",
+  "pydantic>=2.12.4",
+  "tomlkit>=0.13",
+]
 
 [project.optional-dependencies]
 pytask = ["pytask>=0.5"]

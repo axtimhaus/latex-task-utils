@@ -16,8 +16,8 @@ import latex_task_utils.symbols as symbols
     ],
 )
 def test_create_macro_top_level(code, args):
-    s = symbols.Symbol(name="test", code=code)
-    result = s.create_macro()
+    s = symbols.Symbol(code=code)
+    result = symbols.create_macro("test", s)
     print(result)
     assert result == rf"\gdef\test{args}{{{code}}}"
 
@@ -33,7 +33,7 @@ def test_create_macro_top_level(code, args):
 def test_create_macro_groups(order, expected_name, monkeypatch):
     if order:
         monkeypatch.setattr(symbols, "CATEGORY_ORDER", order)
-    s = symbols.Symbol(name="test", category=["top", "sub"], code="code")
-    result = s.create_macro()
+    s = symbols.Symbol(code="code")
+    result = symbols.create_macro("test", s, ["top", "sub"])
     print(result)
     assert result == rf"\gdef\{expected_name}{{code}}"
