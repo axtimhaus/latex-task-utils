@@ -39,9 +39,7 @@ def create_macro(key: str, symbol: Symbol, category: list[str] = []) -> str:
     """Creates a plain TeX macro using `\\gdef` with the `name` and the `code`. The `code` is automatically scanned for arguments. `\\def` is used in favor of `\\newcommand` because it does not create an implicit group, so subscripts and superscripts work as expected."""
     arguments = RE_ARGUMENT.findall(symbol.code)
     comment = (
-        f" % {f'{symbol.name}: ' if (symbol.name and symbol.doc) else f'{symbol.name}'}{symbol.doc}"
-        if (symbol.name or symbol.doc)
-        else ""
+        f" % {f'{symbol.name}: {symbol.doc}' if symbol.name else symbol.doc}" if (symbol.name or symbol.doc) else ""
     )
     return (
         rf"\gdef\{format_symbol_key(key, category)}{''.join(f'#{arg}' for arg in arguments)}{{{symbol.code}}}{comment}"
